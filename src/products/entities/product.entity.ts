@@ -7,13 +7,37 @@ export class Products extends Document {
         index: true
     })
     name: string;
+    @Prop({
+        unique:true,
+    })
     barCode: string;
+    @Prop({
+        unique:true,
+    })
     brand: string;
+    @Prop({
+        type: Object,
+    })
     nutritionalFacts: Object;
+    @Prop({
+        unique:true,
+    })
     category: string;
-    ingredients: Object;
-    ingredientsFatcs: Array<string>;
+    @Prop({
+        type: Array
+    })
+    ingredients: Array<string>;
+    @Prop({
+        unique:true,
+    })
+    ingredientsFacts: Array<string>;
+    @Prop({
+        unique:true,
+    })
     nutritionalFlags: Array<string>;
+    @Prop({
+        unique:true,
+    })
     image: string;
 }
 
