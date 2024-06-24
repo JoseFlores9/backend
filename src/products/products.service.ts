@@ -4,34 +4,46 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { Products } from './entities/product.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, isValidObjectId } from 'mongoose';
-import { NotFoundError } from 'rxjs';
+import { Category } from './entities/category.entity';
+import { FindPRoductQueryDto } from './dto/FindProductQuery.dto';
 
 @Injectable()
 export class ProductsService {
-
   constructor(
-  @InjectModel (Products.name)
-  private readonly productModel: Model<Products >,
-  ){}
+    @InjectModel(Category.name)
+    private readonly categoryModel: Model<Category>,
+    @InjectModel(Products.name)
+    private readonly productModel: Model<Products>,
+  ) {}
 
   async create(createProductDto: CreateProductDto) {
-    console.log(createProductDto)
+    console.log(createProductDto);
     const product = await this.productModel.create(createProductDto);
-    console.log(product)
-    return product ;
+    console.log(product);
+    return product;
   }
 
-  findAll() {
-    return this.productModel.find() ;
+  async findAll(queryParams: FindPRoductQueryDto) {
+    const query = {};
+    for (const key in queryParams) {
+      if (queryParams[key] !== undefined) {
+        if (key === 'categoryId') {
+          const category = await this.categoryModel.findById(queryParams[key]);
+          console.log(category);
+
+          query['category'] = { $in: category?.name };
+        }
+      }
+    }
+    return this.productModel.find(query);
   }
 
   async findOne(id: string) {
-    let product : Products
-    if(!product && isValidObjectId(id)){
-      product = await this.productModel.findById(id)
+    let product: Products;
+    if (!product && isValidObjectId(id)) {
+      product = await this.productModel.findById(id);
     }
-    if(!product)
-      throw new NotFoundException("No existe chaval ese id")
+    if (!product) throw new NotFoundException('No existe chaval ese id');
     return product;
   }
 
@@ -41,5 +53,8 @@ export class ProductsService {
 
   remove(id: number) {
     return `a`;
+  }
+  async filters() {
+    return this.categoryModel.find();
   }
 }
